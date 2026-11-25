@@ -2,7 +2,6 @@ package app.aiclient
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
@@ -71,8 +70,9 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
 
-            override fun onPageStarted(v: WebView, url: String, favicon: Bitmap?) {
-                super.onPageStarted(v, url, favicon)
+            override fun onPageFinished(v: WebView, url: String?) {
+                super.onPageFinished(v, url)
+                persistCookies(url)
             }
         }
 
@@ -145,6 +145,18 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
+    // Делает сессионные cookie постоянными (срок 1 год), чтобы вход не слетал
+    private fun persistCookies(url: String?) {
+        if (url == null) return
+        val cm = CookieManager.getInstance()
+        val raw = cm.getCookie(url) ?: return
+        raw.split(";").forEach { c ->
+            val kv = c.trim()
+            if (kv.contains("=")) cm.setCookie(url, "$kv; Max-Age=31536000; Path=/")
+        }
+        cm.flush()
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         web.saveState(outState)
@@ -152,6 +164,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+        persistCookies(web.url)
         CookieManager.getInstance().flush()
     }
 
