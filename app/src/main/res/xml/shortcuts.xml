@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="change_url"
+        android:enabled="true"
+        android:shortcutShortLabel="@string/change_url">
+        <intent
+            android:action="app.aiclient.CHANGE_URL"
+            android:targetPackage="app.aiclient"
+            android:targetClass="app.aiclient.MainActivity" />
+    </shortcut>
+</shortcuts>
